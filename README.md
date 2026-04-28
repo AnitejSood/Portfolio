@@ -40,14 +40,8 @@ Built with vanilla HTML, CSS, and JavaScript
 - **Hero cutout portrait** — transparent PNG with neon drop-shadow overlay
 - **Clipboard email** — secure copy-to-clipboard instead of mailto links
 
----
 
-## Color Palette
 
-![#140e0b](https://dummyimage.com/40x20/140e0b/000000?text=+) ![#1e1511](https://dummyimage.com/40x20/1e1511/000000?text=+) ![#f8efe6](https://dummyimage.com/40x20/f8efe6/000000?text=+) ![#d4c1b0](https://dummyimage.com/40x20/d4c1b0/000000?text=+) ![#f5a35c](https://dummyimage.com/40x20/f5a35c/000000?text=+) ![#ff6e54](https://dummyimage.com/40x20/ff6e54/000000?text=+) ![#91dbc0](https://dummyimage.com/40x20/91dbc0/000000?text=+)  
-`#140e0b` `#1e1511` `#f8efe6` `#d4c1b0` `#f5a35c` `#ff6e54` `#91dbc0`
-
----
 
 ## Project Structure
 

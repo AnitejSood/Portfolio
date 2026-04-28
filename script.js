@@ -69,7 +69,7 @@ const setSectionLinkState = (activeId) => {
 
 setSectionLinkState("top");
 
-const sectionIds = ["experience", "projects", "skills", "hobbies", "contact"];
+const sectionIds = ["experience", "whoami", "skills", "terminal", "contact"];
 
 const updateActiveSection = () => {
   const scrollY = window.scrollY;
