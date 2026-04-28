@@ -1,0 +1,18 @@
+{
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.anitej.online"
+        }
+      ],
+      "destination": "https://anitej.online/:path*",
+      "permanent": true
+    },
+    { "source": "/github", "destination": "https://github.com/AnitejSood", "permanent": false },
+    { "source": "/linkedin", "destination": "https://linkedin.com/in/anitejcsood", "permanent": false },
+    { "source": "/resume", "destination": "/assets/Anitej_Chander_Sood_Resume.pdf", "permanent": false }
+  ]
+}
