@@ -16,6 +16,7 @@ const interactiveShells = document.querySelectorAll(
   ".interactive-shell, .portrait-orbit, .identity-card, .project-card"
 );
 const tiltItems = document.querySelectorAll("[data-tilt]");
+const customCursor = document.querySelector(".cursor-glow");
 
 const motionEnabled = () =>
   window.matchMedia("(prefers-reduced-motion: no-preference)").matches &&
