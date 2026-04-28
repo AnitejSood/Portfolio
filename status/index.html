@@ -126,8 +126,9 @@
         />
       </div>
 
-      <div style="margin-top:2rem;">
-        <a href="/" class="button button-secondary">← Back to portfolio</a>
+      <div style="margin-top:2rem; display:flex; gap:0.75rem; justify-content:center; flex-wrap:wrap;">
+        <a href="https://stats.uptimerobot.com/cHxAkCg0nx" target="_blank" rel="noreferrer" class="button button-secondary">📊 Full Status Dashboard</a>
+        <a href="/" class="button button-secondary" style="background:var(--panel-strong); color:var(--text);">← Back to portfolio</a>
       </div>
 
     </div>
@@ -137,6 +138,22 @@
   <script>
     document.getElementById("time").textContent =
       "Last updated: " + new Date().toLocaleString();
+  </script>
+
+  <!-- Custom Cursor (same as main site) -->
+  <div class="cursor-blend"></div>
+  <script>
+    const cursor = document.querySelector('.cursor-blend');
+    let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+    let cursorX = mouseX, cursorY = mouseY;
+    window.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; cursor.style.opacity = '1'; });
+    const animateCursor = () => {
+      cursorX += (mouseX - cursorX) * 0.15;
+      cursorY += (mouseY - cursorY) * 0.15;
+      cursor.style.transform = `translate3d(calc(${cursorX}px - 50%), calc(${cursorY}px - 50%), 0)`;
+      requestAnimationFrame(animateCursor);
+    };
+    requestAnimationFrame(animateCursor);
   </script>
 
 </body>
