@@ -136,9 +136,12 @@
               AI Engineer in Bengaluru. Reach out for generative AI, multi-agent systems,
               RAG pipelines, or just a good engineering conversation.
             </p>
-            <div class="profile-meta" style="display: flex; gap: 0.75rem; margin-top: 1rem;">
-              <a class="button button-primary" href="https://www.linkedin.com/in/anitejcsood" target="_blank" rel="noreferrer" style="flex:1; text-align:center;">LinkedIn</a>
-              <button class="button button-secondary" type="button" style="flex:1;" onclick="navigator.clipboard.writeText('anitejchandersood@gmail.com').then(()=>{this.textContent='Copied!'; setTimeout(()=>this.textContent='Email Me',1500)})">Email Me</button>
+            <div class="profile-meta" style="display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1rem;">
+              <a class="button button-primary" href="https://www.linkedin.com/in/anitejcsood" target="_blank" rel="noreferrer" style="text-align:center;">LinkedIn</a>
+              <div style="display: flex; gap: 0.5rem;">
+                <a class="button button-secondary" href="mailto:anitejchandersood@gmail.com" style="flex: 2; text-align: center;">Email Me</a>
+                <button class="button button-secondary" type="button" style="flex: 1; padding: 0;" onclick="navigator.clipboard.writeText('anitejchandersood@gmail.com').then(()=>{const original=this.innerHTML; this.innerHTML='<span style=\'color:#10b981\'>✔</span>'; setTimeout(()=>this.innerHTML=original, 1500)})" title="Copy Email">Copy</button>
+              </div>
             </div>
           </div>
         </section>
@@ -488,8 +491,11 @@
             <div class="contact-panel">
               <div class="contact-stack">
                 <p class="card-kicker">Best channels</p>
-                <button class="button button-primary" type="button" id="copy-email-btn"><img src="assets/logo-mail.svg" alt="" / loading="lazy">Copy Email</button>
-                <a class="button button-secondary" href="https://linkedin.com/in/anitejcsood" target="_blank" rel="noreferrer" data-testid="btn-linkedin"><img src="assets/logo-linkedin.svg" alt="" / loading="lazy">LinkedIn</a>
+                <div style="display: flex; gap: 0.75rem; width: 100%;">
+                  <a class="button button-primary" href="mailto:anitejchandersood@gmail.com" style="flex: 1.5; justify-content: center;"><img src="assets/logo-mail.svg" alt="" / loading="lazy">Email Me</a>
+                  <button class="button button-primary" type="button" id="copy-email-btn" style="flex: 1; justify-content: center;">Copy</button>
+                </div>
+                <a class="button button-secondary" href="https://linkedin.com/in/anitejcsood" target="_blank" rel="noreferrer" data-testid="btn-linkedin" style="width: 100%; justify-content: center;"><img src="assets/logo-linkedin.svg" alt="" / loading="lazy">LinkedIn</a>
               </div>
               <div class="contact-note">
                 <strong>Currently based in Bengaluru.</strong>
@@ -557,28 +563,25 @@ function activateMatrix() {
     const originalTransition = document.body.style.transition;
     
     document.body.style.transition = "all 2s ease";
-    document.body.style.filter = "hue-rotate(90deg) contrast(150%)"; 
     
     const div = document.createElement('div');
     div.innerText = "SYSTEM OVERRIDE INITIATED...";
     div.style.position = "fixed";
-    div.style.top = "0";
-    div.style.left = "0";
-    div.style.width = "100%";
-    div.style.height = "100px";
+    div.style.inset = "0";
     div.style.display = "flex";
     div.style.alignItems = "center";
     div.style.justifyContent = "center";
     div.style.color = "#00ff00";
     div.style.fontFamily = "'Courier New', monospace";
-    div.style.fontSize = "clamp(1.5rem, 5vw, 3rem)";
+    div.style.fontSize = "clamp(2rem, 8vw, 5rem)";
     div.style.fontWeight = "bold";
     div.style.zIndex = "2147483647";
-    div.style.textShadow = "0 0 15px #00ff00";
-    div.style.background = "linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%)";
+    div.style.textShadow = "0 0 20px #00ff00, 0 0 40px #00ff00";
+    div.style.background = "rgba(0, 0, 0, 0.7)";
+    div.style.backdropFilter = "blur(8px)";
     div.style.pointerEvents = "none";
     div.style.textTransform = "uppercase";
-    div.style.letterSpacing = "0.3em";
+    div.style.letterSpacing = "0.2em";
     document.body.appendChild(div);
     
     setTimeout(() => {
@@ -672,7 +675,7 @@ function processCommand(input) {
     } else if (cmd === 'projects') {
         resDiv.innerHTML = "1. LinkedIn AI Agent (End-to-end content automation) [GitHub]<br>2. Synthetic Data Gen Pipeline (Production-grade dataset synthesis)<br>3. Multi-Agent Procurement Intelligence (70% vendor shortlisting acceleration)";
     } else if (cmd === 'contact') {
-        resDiv.innerHTML = "Email: anitejchandersood@gmail.com<br>LinkedIn: linkedin.com/in/anitejcsood<br>Location: Bengaluru";
+        resDiv.innerHTML = "Email: <a href='mailto:anitejchandersood@gmail.com' style='color:var(--accent); text-decoration:underline;'>anitejchandersood@gmail.com</a><br>LinkedIn: <a href='https://linkedin.com/in/anitejcsood' target='_blank' style='color:var(--accent); text-decoration:underline;'>linkedin.com/in/anitejcsood</a><br>Location: Bengaluru";
     } else if (cmd === 'resume') {
         resDiv.innerHTML = "<span class=\"term-success\">Initiating download... Anitej_Chander_Sood_Resume.pdf</span>";
         const a = document.createElement('a');
