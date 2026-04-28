@@ -513,7 +513,7 @@
 <div id="pacman-overlay" class="pacman-overlay hidden" style="z-index: 999999;">
   <button id="close-pacman" class="close-pacman" style="cursor: pointer; z-index: 1000000; box-shadow: 0 0 20px rgba(0,0,0,0.8);">✖ Click to Close</button>
   <div class="pacman-container">
-    <iframe id="pacman-iframe" src="https://play-pac-man.github.io/pac-man/" width="100%" height="100%" style="border:none; border-radius: 12px; overflow:hidden;" onload="this.focus()" allow="autoplay"></iframe>
+    <iframe id="pacman-iframe" src="" data-src="https://play-pac-man.github.io/pac-man/" width="100%" height="100%" style="border:none; border-radius: 12px; overflow:hidden;" onload="this.focus()" allow="autoplay"></iframe>
   </div>
 </div>
 
@@ -521,8 +521,8 @@
   
 <script>
 // Konami Code Easter Egg
-const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
 let konamiIndex = 0;
+const konamiCode = ['a', 'n', 'i', 't', 'e', 'j'];
 
 // Type "ai" easter egg
 let aiIndex = 0;
@@ -553,35 +553,64 @@ document.addEventListener('keydown', (e) => {
 });
 
 function activateMatrix() {
+    const originalFilter = document.body.style.filter;
+    const originalTransition = document.body.style.transition;
+    
     document.body.style.transition = "all 2s ease";
     document.body.style.filter = "hue-rotate(90deg) contrast(150%)"; 
+    
     const div = document.createElement('div');
     div.innerText = "SYSTEM OVERRIDE INITIATED...";
     div.style.position = "fixed";
-    div.style.top = "50%";
-    div.style.left = "50%";
-    div.style.transform = "translate(-50%, -50%)";
+    div.style.top = "0";
+    div.style.left = "0";
+    div.style.width = "100%";
+    div.style.height = "100px";
+    div.style.display = "flex";
+    div.style.alignItems = "center";
+    div.style.justifyContent = "center";
     div.style.color = "#00ff00";
-    div.style.fontFamily = "monospace";
-    div.style.fontSize = "3rem";
-    div.style.zIndex = "9999";
-    div.style.textShadow = "0 0 20px #00ff00";
+    div.style.fontFamily = "'Courier New', monospace";
+    div.style.fontSize = "clamp(1.5rem, 5vw, 3rem)";
+    div.style.fontWeight = "bold";
+    div.style.zIndex = "2147483647";
+    div.style.textShadow = "0 0 15px #00ff00";
+    div.style.background = "linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%)";
+    div.style.pointerEvents = "none";
+    div.style.textTransform = "uppercase";
+    div.style.letterSpacing = "0.3em";
     document.body.appendChild(div);
-    setTimeout(() => div.remove(), 4000);
+    
+    setTimeout(() => {
+        div.remove();
+        document.body.style.filter = originalFilter;
+        setTimeout(() => {
+            document.body.style.transition = originalTransition;
+        }, 2000);
+    }, 4000);
 }
 
 function activateAIGlow() {
     document.body.style.transition = "background 1s ease";
     const mesh = document.querySelector('.grid-mesh');
     if (mesh) {
+        const originalOpacity = mesh.style.opacity;
+        const originalBgSize = mesh.style.backgroundSize;
+        const originalAnim = mesh.style.animation;
+
         mesh.style.opacity = '1';
         mesh.style.backgroundSize = "20px 20px";
         mesh.style.animation = "meshShift 1s linear infinite";
+        
+        setTimeout(() => {
+            mesh.style.opacity = originalOpacity;
+            mesh.style.backgroundSize = originalBgSize;
+            mesh.style.animation = originalAnim;
+        }, 4000);
     }
     console.log("Easter egg: Advanced AI Model Unlocked!");
 }
 
-console.log("%cHello Developers!", "color: #8b5cf6; font-size: 20px; font-weight: bold;");
 </script>
 
   
@@ -674,7 +703,13 @@ function processCommand(input) {
         setTimeout(() => {
             pacmanOverlay.classList.remove('hidden');
             const pFrame = document.getElementById('pacman-iframe');
-            if (pFrame) { pFrame.focus(); try{ pFrame.contentWindow.focus(); }catch(e){} }
+            if (pFrame) { 
+                if (!pFrame.src || pFrame.src === window.location.href) {
+                    pFrame.src = pFrame.getAttribute('data-src');
+                }
+                pFrame.focus(); 
+                try{ pFrame.contentWindow.focus(); }catch(e){} 
+            }
         }, 800);
     } else if (cmd === 'matrix' || cmd === './matrix.sh') {
         resDiv.innerHTML = '<span class="term-warning">Running protocol "matrix"...</span>';
