@@ -386,12 +386,12 @@
             <div class="whoami-card neon-slot reveal">
               <div class="whoami-card-inner">
                 <div class="whoami-card-front">
-                   <img src="assets/normal_guy.avif" alt="Normal Guy" onerror="this.style.opacity='0.1'" loading="lazy">
-                   <div class="whoami-title">Normal Guy 🍕</div>
+                   <img src="assets/guitarist.avif" alt="Guitarist" onerror="this.style.opacity='0.1'" loading="lazy">
+                   <div class="whoami-title">Guitarist & Singer 🎸</div>
                 </div>
                 <div class="whoami-card-back">
-                   <h3>Relatable & Chill</h3>
-                   <p>When the servers are stable, the loss function is 0.2, and the agents are sleeping, I'm just a normal guy enjoying life, gaming, and touching grass.</p>
+                   <h3>Six Strings & A Voice</h3>
+                   <p>When I'm not pushing commits, I'm playing guitar and singing. Music is my other language — the one that doesn't throw runtime errors (usually).</p>
                 </div>
               </div>
             </div>
@@ -519,7 +519,51 @@
 <div id="pacman-overlay" class="pacman-overlay hidden" style="z-index: 999999;">
   <button id="close-pacman" class="close-pacman" style="cursor: pointer; z-index: 1000000; box-shadow: 0 0 20px rgba(0,0,0,0.8);">✖ Click to Close</button>
   <div class="pacman-container">
-    <iframe id="pacman-iframe" src="" data-src="https://play-pac-man.github.io/pac-man/" width="100%" height="100%" style="border:none; border-radius: 12px; overflow:hidden;" onload="this.focus()" allow="autoplay"></iframe>
+    <!-- Loading spinner shown while iframe loads -->
+    <div id="pacman-loader" style="
+        position:absolute; inset:0; display:flex; flex-direction:column;
+        align-items:center; justify-content:center; gap:1.2rem;
+        background:#000; border-radius:12px; z-index:2;">
+      <div id="pacman-spinner" style="
+          width:48px; height:48px; border-radius:50%;
+          border:4px solid rgba(255,220,0,0.15);
+          border-top-color:#ffd700;
+          animation:cyber-spin 0.8s linear infinite;">
+      </div>
+      <div id="pacman-status" style="color:#ffd700; font-family:'Courier New',monospace; font-size:0.85rem; letter-spacing:0.1em;">
+        LOADING PAC-MAN...
+      </div>
+      
+      <!-- Fallback Actions (Retry or Open Direct) -->
+      <div id="pacman-error-actions" style="display:none; flex-direction:column; align-items:center; gap:0.8rem;">
+        <div style="color:#f85149; font-family:'Courier New',monospace; font-size:0.75rem; margin-bottom:0.2rem;">
+          FAILED TO LOAD IFRAME
+        </div>
+        <div style="display:flex; gap:0.6rem;">
+          <button id="pacman-retry" onclick="retryPacman()" style="
+              background:#30363d; color:#c9d1d9; border:1px solid rgba(240,246,252,0.1);
+              padding:0.6rem 1.2rem; border-radius:8px;
+              font-family:inherit; font-size:0.8rem;
+              cursor:pointer; letter-spacing:0.05em; transition:0.2s;">
+            ↺ Retry
+          </button>
+          <a href="https://pacman.anitej.online" target="_blank" style="
+              background:#ffd700; color:#000; text-decoration:none;
+              padding:0.6rem 1.2rem; border-radius:8px;
+              font-family:inherit; font-size:0.8rem; font-weight:bold;
+              cursor:pointer; letter-spacing:0.05em; transition:0.2s;">
+            ↗ Open Direct
+          </a>
+        </div>
+      </div>
+    </div>
+    <iframe id="pacman-iframe" src="" data-src="https://pacman.anitej.online"
+        width="100%" height="100%"
+        style="border:none; border-radius:12px; overflow:hidden; position:relative; z-index:1;"
+        allow="autoplay"
+        onload="document.getElementById('pacman-loader').style.display='none';"
+        onerror="document.getElementById('pacman-error-actions').style.display='flex'; document.getElementById('pacman-spinner').style.display='none'; document.getElementById('pacman-status').style.display='none';">
+    </iframe>
   </div>
 </div>
 
@@ -535,7 +579,11 @@ let aiIndex = 0;
 const aiCode = ['a', 'i'];
 
 document.addEventListener('keydown', (e) => {
-    // Konami
+    // Don't fire easter eggs while the user is typing in any input or textarea
+    const tag = document.activeElement?.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+
+    // Konami (anitej)
     if (e.key === konamiCode[konamiIndex]) {
         konamiIndex++;
         if (konamiIndex === konamiCode.length) {
@@ -559,59 +607,245 @@ document.addEventListener('keydown', (e) => {
 });
 
 function activateMatrix() {
-    const originalFilter = document.body.style.filter;
-    const originalTransition = document.body.style.transition;
-    
-    document.body.style.transition = "all 2s ease";
-    
-    const div = document.createElement('div');
-    div.innerText = "SYSTEM OVERRIDE INITIATED...";
-    div.style.position = "fixed";
-    div.style.inset = "0";
-    div.style.display = "flex";
-    div.style.alignItems = "center";
-    div.style.justifyContent = "center";
-    div.style.color = "#00ff00";
-    div.style.fontFamily = "'Courier New', monospace";
-    div.style.fontSize = "clamp(2rem, 8vw, 5rem)";
-    div.style.fontWeight = "bold";
-    div.style.zIndex = "2147483647";
-    div.style.textShadow = "0 0 20px #00ff00, 0 0 40px #00ff00";
-    div.style.background = "rgba(0, 0, 0, 0.7)";
-    div.style.backdropFilter = "blur(8px)";
-    div.style.pointerEvents = "none";
-    div.style.textTransform = "uppercase";
-    div.style.letterSpacing = "0.2em";
-    document.body.appendChild(div);
-    
+    // Prevent double-triggering
+    if (document.getElementById('matrix-rain-overlay')) return;
+
+    const overlay = document.createElement('div');
+    overlay.id = 'matrix-rain-overlay';
+    overlay.style.cssText = `
+        position: fixed; inset: 0; z-index: 2147483647;
+        background: rgba(0,0,0,0.92); pointer-events: none;
+        opacity: 0; transition: opacity 0.4s ease;
+    `;
+
+    const canvas = document.createElement('canvas');
+    canvas.width  = window.innerWidth;
+    canvas.height = window.innerHeight;
+    canvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;';
+    overlay.appendChild(canvas);
+
+    // "SYSTEM OVERRIDE" label on top of the rain
+    const label = document.createElement('div');
+    label.textContent = 'SYSTEM OVERRIDE';
+    label.style.cssText = `
+        position: absolute; top: 50%; left: 50%;
+        transform: translate(-50%, -50%);
+        color: #00ff00; font-family: 'Courier New', monospace;
+        font-size: clamp(1.5rem, 6vw, 4rem); font-weight: bold;
+        text-shadow: 0 0 20px #00ff00, 0 0 60px #00ff00, 0 0 100px #00ff00;
+        letter-spacing: 0.25em; text-transform: uppercase;
+        animation: matrixPulse 0.8s ease-in-out infinite alternate;
+        pointer-events: none; user-select: none;
+    `;
+    overlay.appendChild(label);
+
+    // Inject pulse keyframe once
+    if (!document.getElementById('matrix-keyframes')) {
+        const style = document.createElement('style');
+        style.id = 'matrix-keyframes';
+        style.textContent = `
+            @keyframes matrixPulse {
+                from { opacity: 0.7; text-shadow: 0 0 10px #00ff00, 0 0 30px #00ff00; }
+                to   { opacity: 1;   text-shadow: 0 0 20px #00ff00, 0 0 80px #00ff00, 0 0 120px #00ff00; }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    document.body.appendChild(overlay);
+
+    // Fade in
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => { overlay.style.opacity = '1'; });
+    });
+
+    // --- Matrix Rain Canvas ---
+    const ctx = canvas.getContext('2d');
+    const fontSize = 16;
+    const cols = Math.floor(canvas.width / fontSize);
+    const drops = Array.from({ length: cols }, () => Math.floor(Math.random() * -canvas.height / fontSize));
+    const chars = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+    let animFrame;
+    const draw = () => {
+        // Semi-transparent black trail
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        ctx.font = `${fontSize}px 'Courier New', monospace`;
+
+        drops.forEach((y, i) => {
+            const char = chars[Math.floor(Math.random() * chars.length)];
+            const x = i * fontSize;
+
+            // Bright white for the leading character
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText(char, x, y * fontSize);
+
+            // Green trail behind
+            ctx.fillStyle = '#00ff41';
+            ctx.fillText(chars[Math.floor(Math.random() * chars.length)], x, (y - 1) * fontSize);
+
+            // Reset column to top (with random delay) after reaching bottom
+            if (y * fontSize > canvas.height && Math.random() > 0.975) {
+                drops[i] = 0;
+            }
+            drops[i]++;
+        });
+
+        animFrame = requestAnimationFrame(draw);
+    };
+    draw();
+
+    // Fade out and clean up after 4 seconds
     setTimeout(() => {
-        div.remove();
-        document.body.style.filter = originalFilter;
+        overlay.style.opacity = '0';
         setTimeout(() => {
-            document.body.style.transition = originalTransition;
-        }, 2000);
+            cancelAnimationFrame(animFrame);
+            overlay.remove();
+        }, 500);
     }, 4000);
 }
 
 function activateAIGlow() {
-    document.body.style.transition = "background 1s ease";
-    const mesh = document.querySelector('.grid-mesh');
-    if (mesh) {
-        const originalOpacity = mesh.style.opacity;
-        const originalBgSize = mesh.style.backgroundSize;
-        const originalAnim = mesh.style.animation;
+    if (document.getElementById('ai-glow-overlay')) return;
 
-        mesh.style.opacity = '1';
-        mesh.style.backgroundSize = "20px 20px";
-        mesh.style.animation = "meshShift 1s linear infinite";
-        
-        setTimeout(() => {
-            mesh.style.opacity = originalOpacity;
-            mesh.style.backgroundSize = originalBgSize;
-            mesh.style.animation = originalAnim;
-        }, 4000);
+    // --- Inject keyframes once ---
+    if (!document.getElementById('ai-glow-keyframes')) {
+        const style = document.createElement('style');
+        style.id = 'ai-glow-keyframes';
+        style.textContent = `
+            @keyframes aiScanline {
+                0%   { transform: translateY(-100%); }
+                100% { transform: translateY(100vh); }
+            }
+            @keyframes aiFlicker {
+                0%, 100% { opacity: 1; }
+                50%       { opacity: 0.85; }
+            }
+            @keyframes aiPulseRing {
+                0%   { transform: translate(-50%,-50%) scale(0.6); opacity: 1; }
+                100% { transform: translate(-50%,-50%) scale(2.2); opacity: 0; }
+            }
+            @keyframes aiTypeIn {
+                from { width: 0; }
+                to   { width: 100%; }
+            }
+            @keyframes aiHudFadeIn {
+                from { opacity: 0; transform: translate(-50%,-50%) scale(0.92); }
+                to   { opacity: 1; transform: translate(-50%,-50%) scale(1); }
+            }
+            @keyframes aiChroma {
+                0%   { filter: none; }
+                15%  { filter: hue-rotate(90deg) saturate(3) brightness(1.4); }
+                30%  { filter: none; }
+                50%  { filter: hue-rotate(200deg) saturate(2) brightness(1.2); }
+                65%  { filter: none; }
+                100% { filter: none; }
+            }
+        `;
+        document.head.appendChild(style);
     }
-    console.log("Easter egg: Advanced AI Model Unlocked!");
+
+    // --- Overlay container ---
+    const overlay = document.createElement('div');
+    overlay.id = 'ai-glow-overlay';
+    overlay.style.cssText = `
+        position: fixed; inset: 0; z-index: 2147483646;
+        pointer-events: none; opacity: 0;
+        transition: opacity 0.3s ease;
+        background: radial-gradient(ellipse at center, rgba(139,92,246,0.18) 0%, rgba(59,130,246,0.10) 50%, transparent 80%);
+        animation: aiFlicker 0.15s ease infinite, aiChroma 1.2s ease forwards;
+    `;
+    document.body.appendChild(overlay);
+
+    // --- Scanline sweep ---
+    const scanline = document.createElement('div');
+    scanline.style.cssText = `
+        position: absolute; left: 0; right: 0; height: 3px;
+        background: linear-gradient(90deg, transparent, #a78bfa, #60a5fa, #a78bfa, transparent);
+        box-shadow: 0 0 18px 4px rgba(167,139,250,0.8), 0 0 40px 10px rgba(96,165,250,0.4);
+        animation: aiScanline 0.9s linear 3;
+        top: 0;
+    `;
+    overlay.appendChild(scanline);
+
+    // --- Pulse rings ---
+    for (let i = 0; i < 3; i++) {
+        const ring = document.createElement('div');
+        ring.style.cssText = `
+            position: absolute; top: 50%; left: 50%;
+            width: 300px; height: 300px; margin: -150px 0 0 -150px;
+            border-radius: 50%;
+            border: 2px solid rgba(167,139,250,${0.8 - i * 0.2});
+            box-shadow: 0 0 30px rgba(167,139,250,0.5);
+            animation: aiPulseRing ${0.9 + i * 0.35}s ease-out ${i * 0.25}s forwards;
+            opacity: 0;
+        `;
+        overlay.appendChild(ring);
+    }
+
+    // --- Central HUD card ---
+    const hud = document.createElement('div');
+    hud.style.cssText = `
+        position: absolute; top: 50%; left: 50%;
+        transform: translate(-50%,-50%) scale(0.92);
+        animation: aiHudFadeIn 0.35s ease forwards;
+        background: rgba(10,10,20,0.88);
+        border: 1px solid rgba(167,139,250,0.6);
+        border-radius: 16px;
+        padding: 2rem 3rem;
+        text-align: center;
+        min-width: 340px;
+        box-shadow: 0 0 60px rgba(139,92,246,0.5), 0 0 120px rgba(59,130,246,0.25), inset 0 0 40px rgba(139,92,246,0.1);
+        backdrop-filter: blur(12px);
+    `;
+
+    hud.innerHTML = `
+        <div style="
+            color:#a78bfa; font-family:'Courier New',monospace;
+            font-size:0.72rem; letter-spacing:0.35em; text-transform:uppercase;
+            margin-bottom:0.6rem; opacity:0.7;">
+            ◈ SYSTEM SIGNAL DETECTED ◈
+        </div>
+        <div style="
+            color:#ffffff; font-family:'Space Grotesk','Courier New',monospace;
+            font-size:clamp(1.4rem,4vw,2.2rem); font-weight:700;
+            letter-spacing:0.12em; text-transform:uppercase;
+            text-shadow: 0 0 20px #a78bfa, 0 0 40px #60a5fa;
+            margin-bottom:0.5rem;">
+            ⚡ AI MODE ENGAGED
+        </div>
+        <div style="
+            color:#60a5fa; font-family:'Courier New',monospace;
+            font-size:0.82rem; letter-spacing:0.1em;
+            overflow:hidden; white-space:nowrap;
+            border-right:2px solid #60a5fa;
+            width:0; animation:aiTypeIn 1.2s steps(32,end) 0.3s forwards;
+            margin: 0 auto 1rem;">
+            loading neural pathways... done.
+        </div>
+        <div style="
+            display:flex; gap:0.5rem; justify-content:center; flex-wrap:wrap;">
+            ${['GPT','Gemini','Claude','LangGraph','RAG','Agents'].map(t =>
+                `<span style="
+                    background:rgba(139,92,246,0.2); border:1px solid rgba(167,139,250,0.4);
+                    color:#c4b5fd; border-radius:20px; padding:0.25rem 0.7rem;
+                    font-size:0.72rem; font-family:'Space Grotesk',sans-serif;
+                    letter-spacing:0.05em;">${t}</span>`
+            ).join('')}
+        </div>
+    `;
+    overlay.appendChild(hud);
+
+    // Fade in
+    requestAnimationFrame(() => requestAnimationFrame(() => { overlay.style.opacity = '1'; }));
+
+    // Auto-revert after 4s
+    setTimeout(() => {
+        overlay.style.opacity = '0';
+        setTimeout(() => overlay.remove(), 400);
+    }, 4000);
 }
 
 </script>
@@ -667,7 +901,8 @@ function processCommand(input) {
         <span class="term-highlight" style="display:inline-block; width:80px;">sudo</span>   - [RESTRICTED] Elevate privileges<br>
         <span class="term-highlight" style="display:inline-block; width:80px;">theme</span>  - Toggle visual interface mode<br>
         <span class="term-highlight" style="display:inline-block; width:80px;">pacman</span> - [EXECUTABLE] Launch retro simulation<br>
-        <span class="term-highlight" style="display:inline-block; width:80px;">matrix</span> - [EXECUTABLE] System override`;
+        <span class="term-highlight" style="display:inline-block; width:80px;">matrix</span> - [EXECUTABLE] System override<br>
+        <span class="term-highlight" style="display:inline-block; width:80px;">engage</span> - [EXECUTABLE] Engage AI mode`;
     } else if (cmd === 'whoami') {
         resDiv.innerHTML = "Anitej Chander Sood: AI Engineer building multi-agent systems and production-grade Generative AI at Genpact.";
     } else if (cmd === 'skills') {
@@ -706,26 +941,93 @@ function processCommand(input) {
         setTimeout(() => {
             pacmanOverlay.classList.remove('hidden');
             const pFrame = document.getElementById('pacman-iframe');
-            if (pFrame) { 
-                if (!pFrame.src || pFrame.src === window.location.href) {
-                    pFrame.src = pFrame.getAttribute('data-src');
+            const loader = document.getElementById('pacman-loader');
+            const retryBtn = document.getElementById('pacman-retry');
+
+            if (pFrame) {
+                const dataSrc = pFrame.getAttribute('data-src');
+                const loader = document.getElementById('pacman-loader');
+                const spinner = document.getElementById('pacman-spinner');
+                const status = document.getElementById('pacman-status');
+                const errorActions = document.getElementById('pacman-error-actions');
+
+                const alreadyLoaded = pFrame.src === dataSrc || pFrame.src === dataSrc + '/';
+
+                if (alreadyLoaded) {
+                    if (loader) loader.style.display = 'none';
+                } else {
+                    if (loader) loader.style.display = 'flex';
+                    if (spinner) spinner.style.display = 'block';
+                    if (status) status.style.display = 'block';
+                    if (errorActions) errorActions.style.display = 'none';
+                    pFrame.src = dataSrc;
+
+                    const safetyTimer = setTimeout(() => {
+                        if (loader && loader.style.display !== 'none') {
+                            if (spinner) spinner.style.display = 'none';
+                            if (status) status.style.display = 'none';
+                            if (errorActions) errorActions.style.display = 'flex';
+                        }
+                    }, 12000);
+
+                    pFrame.addEventListener('load', () => {
+                        clearTimeout(safetyTimer);
+                        if (loader) loader.style.display = 'none';
+                        pFrame.focus();
+                        try { pFrame.contentWindow.focus(); } catch(e) {}
+                    }, { once: true });
                 }
-                pFrame.focus(); 
-                try{ pFrame.contentWindow.focus(); }catch(e){} 
+
+                pFrame.focus();
+                try { pFrame.contentWindow.focus(); } catch(e) {}
             }
         }, 800);
     } else if (cmd === 'matrix' || cmd === './matrix.sh') {
         resDiv.innerHTML = '<span class="term-warning">Running protocol "matrix"...</span>';
         if (typeof activateMatrix === 'function') activateMatrix();
+    } else if (cmd === 'engage') {
+        resDiv.innerHTML = '<span class="term-success">[SUCCESS] Engaging AI mode... loading neural pathways.</span>';
+        if (typeof activateAIGlow === 'function') activateAIGlow();
     } else {
         resDiv.innerHTML = `Command not found: ${cmd}. Type 'help' to see available commands.`;
     }
     termHistory.appendChild(resDiv);
 }
 
+function retryPacman() {
+    const pFrame = document.getElementById('pacman-iframe');
+    const loader = document.getElementById('pacman-loader');
+    const spinner = document.getElementById('pacman-spinner');
+    const status = document.getElementById('pacman-status');
+    const errorActions = document.getElementById('pacman-error-actions');
+
+    if (loader) loader.style.display = 'flex';
+    if (spinner) spinner.style.display = 'block';
+    if (status) status.style.display = 'block';
+    if (errorActions) errorActions.style.display = 'none';
+
+    if (pFrame) {
+        pFrame.src = '';
+        setTimeout(() => { pFrame.src = pFrame.getAttribute('data-src'); }, 100);
+    }
+}
+
 if (pacmanClose) {
     pacmanClose.addEventListener('click', () => {
         pacmanOverlay.classList.add('hidden');
+        const pFrame = document.getElementById('pacman-iframe');
+        if (pFrame) pFrame.src = ''; 
+        
+        const loader = document.getElementById('pacman-loader');
+        const spinner = document.getElementById('pacman-spinner');
+        const status = document.getElementById('pacman-status');
+        const errorActions = document.getElementById('pacman-error-actions');
+
+        if (loader) loader.style.display = 'flex';
+        if (spinner) spinner.style.display = 'block';
+        if (status) status.style.display = 'block';
+        if (errorActions) errorActions.style.display = 'none';
+
         if (termInput) termInput.focus();
     });
 }
@@ -733,6 +1035,8 @@ if (pacmanClose) {
 document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !pacmanOverlay.classList.contains('hidden')) {
         pacmanOverlay.classList.add('hidden');
+        const pFrame = document.getElementById('pacman-iframe');
+        if (pFrame) pFrame.src = ''; // Kill sounds
         if (termInput) termInput.focus();
     }
 });
@@ -757,35 +1061,71 @@ window.addEventListener('DOMContentLoaded', () => {
   }, 1200);
 });
 
-// Perfect Mix-Blend-Mode Magnetic Cursor
+// Performance-Optimised Magnetic Cursor
+// Uses a self-cancelling RAF loop — stops when cursor has settled to save GPU cycles.
 const cursor = document.querySelector('.cursor-blend');
-let mouseX = window.innerWidth / 2; let mouseY = window.innerHeight / 2;
-let cursorX = window.innerWidth / 2; let cursorY = window.innerHeight / 2;
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const hasFinePinter = window.matchMedia('(any-pointer: fine)').matches;
 
-window.addEventListener('mousemove', (e) => {
-  mouseX = e.clientX; mouseY = e.clientY;
-  if(cursor.style.opacity === '') cursor.style.opacity = '1';
-});
+if (cursor && hasFinePinter && !prefersReducedMotion) {
+  let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+  let cursorX = mouseX, cursorY = mouseY;
+  let rafId = null;
+  let isMoving = false;
 
-const animateCursor = () => {
-  cursorX += (mouseX - cursorX) * 0.15;
-  cursorY += (mouseY - cursorY) * 0.15;
-  cursor.style.transform = `translate3d(calc(${cursorX}px - 50%), calc(${cursorY}px - 50%), 0)`;
-  requestAnimationFrame(animateCursor);
-};
-requestAnimationFrame(animateCursor);
+  const stopThreshold = 0.05; // px — stop loop when settled within this distance
 
-const applyHover = () => {
-  const interactives = document.querySelectorAll('a, button, .interactive-shell, .whoami-card, .theme-toggle');
-  interactives.forEach(el => {
-    if(!el.dataset.cursorBound) {
-      el.dataset.cursorBound = true;
-      el.addEventListener('mouseenter', () => cursor.classList.add('cursor-over'));
-      el.addEventListener('mouseleave', () => cursor.classList.remove('cursor-over'));
+  const animateCursor = () => {
+    const dx = mouseX - cursorX;
+    const dy = mouseY - cursorY;
+    cursorX += dx * 0.15;
+    cursorY += dy * 0.15;
+    cursor.style.transform = `translate3d(calc(${cursorX}px - 50%), calc(${cursorY}px - 50%), 0)`;
+
+    // Keep looping only while cursor is still moving toward target
+    if (Math.abs(dx) > stopThreshold || Math.abs(dy) > stopThreshold) {
+      rafId = requestAnimationFrame(animateCursor);
+    } else {
+      rafId = null;
+      isMoving = false;
+    }
+  };
+
+  window.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    if (cursor.style.opacity === '') cursor.style.opacity = '1';
+    // Only start a new RAF loop if one isn't already running
+    if (!isMoving) {
+      isMoving = true;
+      rafId = requestAnimationFrame(animateCursor);
+    }
+  }, { passive: true });
+
+  // Pause when tab is hidden (saves battery on work laptops)
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden && rafId) {
+      cancelAnimationFrame(rafId);
+      rafId = null;
+      isMoving = false;
     }
   });
-};
-setTimeout(applyHover, 1000); // Apply after initial load mapping
+
+  const applyHover = () => {
+    const interactives = document.querySelectorAll('a, button, .interactive-shell, .whoami-card, .theme-toggle');
+    interactives.forEach(el => {
+      if (!el.dataset.cursorBound) {
+        el.dataset.cursorBound = true;
+        el.addEventListener('mouseenter', () => cursor.classList.add('cursor-over'));
+        el.addEventListener('mouseleave', () => cursor.classList.remove('cursor-over'));
+      }
+    });
+  };
+  setTimeout(applyHover, 1000);
+} else if (cursor) {
+  // On touch/reduced-motion devices, fully hide the custom cursor
+  cursor.style.display = 'none';
+}
 </script>
 
 
