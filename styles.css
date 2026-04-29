@@ -2484,20 +2484,20 @@ body.site-ready .hero-stage {
   animation: glitch-anim2 5s infinite linear alternate-reverse;
 }
 @keyframes glitch-anim {
-  0% { clip: rect(25px, 9999px, 8px, 0); }
-  20% { clip: rect(48px, 9999px, 45px, 0); }
-  40% { clip: rect(61px, 9999px, 34px, 0); }
-  60% { clip: rect(2px, 9999px, 58px, 0); }
-  80% { clip: rect(100px, 9999px, 78px, 0); }
-  100% { clip: rect(14px, 9999px, 20px, 0); }
+  0% { clip-path: inset(25px 0 8px 0); }
+  20% { clip-path: inset(45px 0 48px 0); }
+  40% { clip-path: inset(34px 0 61px 0); }
+  60% { clip-path: inset(2px 0 58px 0); }
+  80% { clip-path: inset(78px 0 100px 0); }
+  100% { clip-path: inset(14px 0 20px 0); }
 }
 @keyframes glitch-anim2 {
-  0% { clip: rect(35px, 9999px, 15px, 0); }
-  20% { clip: rect(58px, 9999px, 65px, 0); }
-  40% { clip: rect(11px, 9999px, 84px, 0); }
-  60% { clip: rect(92px, 9999px, 38px, 0); }
-  80% { clip: rect(50px, 9999px, 18px, 0); }
-  100% { clip: rect(64px, 9999px, 40px, 0); }
+  0% { clip-path: inset(35px 0 15px 0); }
+  20% { clip-path: inset(58px 0 65px 0); }
+  40% { clip-path: inset(11px 0 84px 0); }
+  60% { clip-path: inset(92px 0 38px 0); }
+  80% { clip-path: inset(50px 0 18px 0); }
+  100% { clip-path: inset(64px 0 40px 0); }
 }
 
 .sub-glitch {
@@ -2731,7 +2731,8 @@ body.site-ready .hero-stage {
     mix-blend-mode: difference;
     transform: translate3d(-50%, -50%, 0);
     transition: width 0.3s cubic-bezier(0.19, 1, 0.22, 1), height 0.3s cubic-bezier(0.19, 1, 0.22, 1), border-radius 0.3s;
-    will-change: width, height, transform;
+    will-change: transform; /* only transform changes frequently — width/height is rare */
+    contain: layout style; /* isolate compositing to prevent full-page repaints */
     opacity: 0; /* hidden until mousemove */
 }
 .cursor-blend.cursor-over {
